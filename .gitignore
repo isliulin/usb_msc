@@ -1,0 +1,5 @@
+# 工程忽略文件
+/EWARM/*
+!/EWARM/startup_stm32f103xb.s
+!/EWARM/stm32f103xb_flash.icf
+!/EWARM/stm32f103xb_sram.icf
