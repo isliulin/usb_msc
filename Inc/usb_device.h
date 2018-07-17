@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
+  * @file           : usb_device.h
+  * @version        : v2.0_Cube
+  * @brief          : Header for usb_device.c file.
   ******************************************************************************
   * This notice applies to any and all portions of this file
   * that are not between comment pairs USER CODE BEGIN and
@@ -48,69 +48,67 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H__
-#define __MAIN_H__
-
-/* Includes ------------------------------------------------------------------*/
-
-/* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
-
-/* Private define ------------------------------------------------------------*/
-
-#define D0_Pin GPIO_PIN_0
-#define D0_GPIO_Port GPIOA
-#define D1_Pin GPIO_PIN_1
-#define D1_GPIO_Port GPIOA
-#define D2_Pin GPIO_PIN_2
-#define D2_GPIO_Port GPIOA
-#define D3_Pin GPIO_PIN_3
-#define D3_GPIO_Port GPIOA
-#define D4_Pin GPIO_PIN_4
-#define D4_GPIO_Port GPIOA
-#define D5_Pin GPIO_PIN_5
-#define D5_GPIO_Port GPIOA
-#define D6_Pin GPIO_PIN_6
-#define D6_GPIO_Port GPIOA
-#define D7_Pin GPIO_PIN_7
-#define D7_GPIO_Port GPIOA
-#define RB_Pin GPIO_PIN_1
-#define RB_GPIO_Port GPIOB
-#define RE_Pin GPIO_PIN_10
-#define RE_GPIO_Port GPIOB
-#define CE_Pin GPIO_PIN_11
-#define CE_GPIO_Port GPIOB
-#define CLE_Pin GPIO_PIN_12
-#define CLE_GPIO_Port GPIOB
-#define ALE_Pin GPIO_PIN_13
-#define ALE_GPIO_Port GPIOB
-#define WE_Pin GPIO_PIN_14
-#define WE_GPIO_Port GPIOB
-#define LED_Pin GPIO_PIN_15
-#define LED_GPIO_Port GPIOB
-
-/* ########################## Assert Selection ############################## */
-/**
-  * @brief Uncomment the line below to expanse the "assert_param" macro in the 
-  *        HAL drivers code
-  */
- #define USE_FULL_ASSERT    1U 
-
-/* USER CODE BEGIN Private defines */
-
-/* USER CODE END Private defines */
+#ifndef __USB_DEVICE__H__
+#define __USB_DEVICE__H__
 
 #ifdef __cplusplus
  extern "C" {
 #endif
-void _Error_Handler(char *, int);
 
-#define Error_Handler() _Error_Handler(__FILE__, __LINE__)
+/* Includes ------------------------------------------------------------------*/
+#include "stm32f1xx.h"
+#include "stm32f1xx_hal.h"
+#include "usbd_def.h"
+
+/* USER CODE BEGIN INCLUDE */
+
+/* USER CODE END INCLUDE */
+
+/** @addtogroup USBD_OTG_DRIVER
+  * @{
+  */
+
+/** @defgroup USBD_DEVICE USBD_DEVICE
+  * @brief Device file for Usb otg low level driver.
+  * @{
+  */
+
+/** @defgroup USBD_DEVICE_Exported_Variables USBD_DEVICE_Exported_Variables
+  * @brief Public variables.
+  * @{
+  */
+
+/** USB device core handle. */
+extern USBD_HandleTypeDef hUsbDeviceFS;
+
+/**
+  * @}
+  */
+
+/** @defgroup USBD_DEVICE_Exported_FunctionsPrototype USBD_DEVICE_Exported_FunctionsPrototype
+  * @brief Declaration of public functions for Usb device.
+  * @{
+  */
+
+/** USB Device initialization function. */
+void MX_USB_DEVICE_Init(void);
+
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __MAIN_H__ */
+#endif /* __USB_DEVICE__H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -53,21 +53,25 @@
 
 /* USER CODE BEGIN Includes */     
 #include "gpio.h"
+#include "nand_flash_io.h"
+#include "log.h"
+#define  LOG_MODULE_LEVEL    LOG_LEVEL_DEBUG
+#define  LOG_MODULE_NAME     "freertos"
 /* USER CODE END Includes */
 
 /* Variables -----------------------------------------------------------------*/
 osThreadId defaultTaskHandle;
 
 /* USER CODE BEGIN Variables */
-
+extern nand_flash_hal_io_t nand_hal_io;
 /* USER CODE END Variables */
 
 /* Function prototypes -------------------------------------------------------*/
 void StartDefaultTask(void const * argument);
 
+extern void MX_USB_DEVICE_Init(void);
 extern void MX_FATFS_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
-
 /* USER CODE BEGIN FunctionPrototypes */
 
 /* USER CODE END FunctionPrototypes */
@@ -95,7 +99,7 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 256);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -110,17 +114,65 @@ void MX_FREERTOS_Init(void) {
 /* StartDefaultTask function */
 void StartDefaultTask(void const * argument)
 {
+  /* init code for USB_DEVICE */
+  MX_USB_DEVICE_Init();
+
   /* init code for FATFS */
   MX_FATFS_Init();
 
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
+  uint8_t id[5];
+  uint8_t *buff=0;
+  int status;
+  nand_flash_register_hal_io(&nand_hal_io);
+  nand_flash_init();
+  status = nand_flash_id_read(id);
+  if(status == -1){
+  log_error("read id err.\r\n");
+  }
+  for(uint8_t i=0;i<5;i++){
+    log_info("id[%d]: %d.\r\n",i,id[i]);
+  }
+  buff = pvPortMalloc(2048);
+  if(buff == 0){
+  log_error("malloc error.\r\n");
+  }else{
+  
+  status = nand_flash_block_erase(0);
+  if(status == -1){
+  log_error("block erase error.\r\n");
+  }else{
+  log_info("block erase ok.\r\n");
+  }
+  for(uint16_t i=0;i<2048;i++){
+   buff[i]=i;
+  }
+  status = nand_flash_page_program(0,buff,2048);
+  if(status == -1){
+  log_error("page program error.\r\n");
+  }else{
+  log_info("page program ok.\r\n");
+  }
+  status = nand_flash_page_read(0,buff,2048);
+  if(status == -1){
+  log_error("page read error.\r\n");
+  }else{
+   log_info("page read ok.\r\n"); 
+   for(uint16_t i=0;i<2048;i++){
+   log_debug("buff[%d]:%d.\r\n",i,buff[i]);
+   osDelay(1);
+  } 
+  }
+  }
   for(;;)
   {
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
-    osDelay(50);
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
-    osDelay(50);
+    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+    osDelay(40);
+    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+    osDelay(40);
+    
+    
   }
   /* USER CODE END StartDefaultTask */
 }

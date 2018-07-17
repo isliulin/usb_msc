@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : USB.c
-  * Description        : This file provides code for the configuration
-  *                      of the USB instances.
+  * @file           : usbd_storage_if.h
+  * @version        : v2.0_Cube
+  * @brief          : Header for usbd_storage_if.c file.
   ******************************************************************************
   * This notice applies to any and all portions of this file
   * that are not between comment pairs USER CODE BEGIN and
@@ -47,79 +47,94 @@
   ******************************************************************************
   */
 
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __USBD_STORAGE_IF_H__
+#define __USBD_STORAGE_IF_H__
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /* Includes ------------------------------------------------------------------*/
-#include "usb.h"
+#include "usbd_msc.h"
 
-/* USER CODE BEGIN 0 */
+/* USER CODE BEGIN INCLUDE */
 
-/* USER CODE END 0 */
+/* USER CODE END INCLUDE */
 
-PCD_HandleTypeDef hpcd_USB_FS;
+/** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
+  * @brief For Usb device.
+  * @{
+  */
 
-/* USB init function */
+/** @defgroup USBD_STORAGE USBD_STORAGE
+  * @brief Header file for the usb_storage_if.c file
+  * @{
+  */
 
-void MX_USB_PCD_Init(void)
-{
+/** @defgroup USBD_STORAGE_Exported_Defines USBD_STORAGE_Exported_Defines
+  * @brief Defines.
+  * @{
+  */
 
-  hpcd_USB_FS.Instance = USB;
-  hpcd_USB_FS.Init.dev_endpoints = 8;
-  hpcd_USB_FS.Init.speed = PCD_SPEED_FULL;
-  hpcd_USB_FS.Init.ep0_mps = DEP0CTL_MPS_8;
-  hpcd_USB_FS.Init.low_power_enable = DISABLE;
-  hpcd_USB_FS.Init.lpm_enable = DISABLE;
-  hpcd_USB_FS.Init.battery_charging_enable = DISABLE;
-  if (HAL_PCD_Init(&hpcd_USB_FS) != HAL_OK)
-  {
-    _Error_Handler(__FILE__, __LINE__);
-  }
+/* USER CODE BEGIN EXPORTED_DEFINES */
 
-}
+/* USER CODE END EXPORTED_DEFINES */
 
-void HAL_PCD_MspInit(PCD_HandleTypeDef* pcdHandle)
-{
+/**
+  * @}
+  */
 
-  if(pcdHandle->Instance==USB)
-  {
-  /* USER CODE BEGIN USB_MspInit 0 */
+/** @defgroup USBD_STORAGE_Exported_Types USBD_STORAGE_Exported_Types
+  * @brief Types.
+  * @{
+  */
 
-  /* USER CODE END USB_MspInit 0 */
-    /* USB clock enable */
-    __HAL_RCC_USB_CLK_ENABLE();
+/* USER CODE BEGIN EXPORTED_TYPES */
 
-    /* USB interrupt Init */
-    HAL_NVIC_SetPriority(USB_HP_CAN1_TX_IRQn, 5, 0);
-    HAL_NVIC_EnableIRQ(USB_HP_CAN1_TX_IRQn);
-    HAL_NVIC_SetPriority(USB_LP_CAN1_RX0_IRQn, 5, 0);
-    HAL_NVIC_EnableIRQ(USB_LP_CAN1_RX0_IRQn);
-  /* USER CODE BEGIN USB_MspInit 1 */
+/* USER CODE END EXPORTED_TYPES */
 
-  /* USER CODE END USB_MspInit 1 */
-  }
-}
+/**
+  * @}
+  */
 
-void HAL_PCD_MspDeInit(PCD_HandleTypeDef* pcdHandle)
-{
+/** @defgroup USBD_STORAGE_Exported_Macros USBD_STORAGE_Exported_Macros
+  * @brief Aliases.
+  * @{
+  */
 
-  if(pcdHandle->Instance==USB)
-  {
-  /* USER CODE BEGIN USB_MspDeInit 0 */
+/* USER CODE BEGIN EXPORTED_MACRO */
 
-  /* USER CODE END USB_MspDeInit 0 */
-    /* Peripheral clock disable */
-    __HAL_RCC_USB_CLK_DISABLE();
+/* USER CODE END EXPORTED_MACRO */
 
-    /* USB interrupt Deinit */
-    HAL_NVIC_DisableIRQ(USB_HP_CAN1_TX_IRQn);
-    HAL_NVIC_DisableIRQ(USB_LP_CAN1_RX0_IRQn);
-  /* USER CODE BEGIN USB_MspDeInit 1 */
+/**
+  * @}
+  */
 
-  /* USER CODE END USB_MspDeInit 1 */
-  }
-} 
+/** @defgroup USBD_STORAGE_Exported_Variables USBD_STORAGE_Exported_Variables
+  * @brief Public variables.
+  * @{
+  */
 
-/* USER CODE BEGIN 1 */
+/** STORAGE Interface callback. */
+extern USBD_StorageTypeDef USBD_Storage_Interface_fops_FS;
 
-/* USER CODE END 1 */
+/* USER CODE BEGIN EXPORTED_VARIABLES */
+
+/* USER CODE END EXPORTED_VARIABLES */
+
+/**
+  * @}
+  */
+
+/** @defgroup USBD_STORAGE_Exported_FunctionsPrototype USBD_STORAGE_Exported_FunctionsPrototype
+  * @brief Public functions declaration.
+  * @{
+  */
+
+/* USER CODE BEGIN EXPORTED_FUNCTIONS */
+
+/* USER CODE END EXPORTED_FUNCTIONS */
 
 /**
   * @}
@@ -128,5 +143,15 @@ void HAL_PCD_MspDeInit(PCD_HandleTypeDef* pcdHandle)
 /**
   * @}
   */
+
+/**
+  * @}
+  */
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __USBD_STORAGE_IF_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
