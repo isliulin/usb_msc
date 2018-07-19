@@ -2,6 +2,13 @@
 #include "main.h"
 #include "gpio.h"
 
+typedef enum
+{
+  DATA_IO_DIR_INPUT,
+  DATA_IO_DIR_OUTPUT
+}data_io_dir_t;
+
+static data_io_dir_t io_dir=DATA_IO_DIR_OUTPUT;
 
 static void nand_flash_hal_io_ale_ctrl(io_status_t status)
 {
@@ -33,7 +40,7 @@ static void  data_io_init_output()
                           |D4_Pin|D5_Pin|D6_Pin|D7_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 }
 
@@ -50,7 +57,7 @@ static void  data_io_init_input()
                           |D4_Pin|D5_Pin|D6_Pin|D7_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 }
 
@@ -60,7 +67,10 @@ GPIO_PinState status;
 uint8_t i;
 uint8_t data_in=0;
 
+if(io_dir == DATA_IO_DIR_OUTPUT){
 data_io_init_input();
+io_dir = DATA_IO_DIR_INPUT;
+}
 
 for(i=0;i<8;i++){
 status = HAL_GPIO_ReadPin(D0_GPIO_Port,D0_Pin<<i);
@@ -68,13 +78,16 @@ if(status == GPIO_PIN_SET){
 data_in|=1<<i;
  }
 }
-data_io_init_output();
-
 return data_in;
 }
 static void nand_flash_hal_io_data_out(uint8_t data_out)
 {
   uint8_t i;
+  if(io_dir == DATA_IO_DIR_INPUT){
+  data_io_init_output();
+  io_dir = DATA_IO_DIR_OUTPUT;
+  }
+  
   for(i=0;i<8;i++){
   if(data_out & (1<<i)){
   HAL_GPIO_WritePin(D0_GPIO_Port,D0_Pin<<i,GPIO_PIN_SET);  

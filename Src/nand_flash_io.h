@@ -20,6 +20,12 @@
 
 NAND_FLASH_IO_BEGIN
 
+#define  PAGE_SIZE                   2048
+#define  PAGE_NUM_PER_BLOCK          64
+#define  BLOCK_SIZE                 (PAGE_SIZE*PAGE_NUM_PER_BLOCK)
+#define  BLOCK_NUM_PER_CHIP          2048
+
+
 typedef enum
 {
  IO_RESET=0,
@@ -41,8 +47,8 @@ typedef struct
 int nand_flash_register_hal_io(nand_flash_hal_io_t *io);
 int nand_flash_init(void);
 int nand_flash_id_read(uint8_t *id);
-int nand_flash_page_read(uint32_t addr,uint8_t *buff,uint16_t len);
-int nand_flash_page_program(uint32_t addr,uint8_t *buff,uint16_t len);
+int nand_flash_page_read(uint32_t addr,uint16_t offset,uint8_t *buff,uint16_t len);
+int nand_flash_page_program(uint32_t addr,uint16_t offset,uint8_t *buff,uint16_t len);
 int nand_flash_block_erase(uint16_t addr);
 
 

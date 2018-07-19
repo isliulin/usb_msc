@@ -70,10 +70,13 @@ extern nand_flash_hal_io_t nand_hal_io;
 void StartDefaultTask(void const * argument);
 
 extern void MX_USB_DEVICE_Init(void);
-extern void MX_FATFS_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
-/* USER CODE BEGIN FunctionPrototypes */
 
+/* USER CODE BEGIN FunctionPrototypes */
+ uint32_t log_time(void)
+{
+return osKernelSysTick();
+}
 /* USER CODE END FunctionPrototypes */
 
 /* Hook prototypes */
@@ -117,56 +120,108 @@ void StartDefaultTask(void const * argument)
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
 
-  /* init code for FATFS */
-  MX_FATFS_Init();
-
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
-  uint8_t id[5];
+  uint8_t id[5],cmd[3];
   uint8_t *buff=0;
   int status;
   nand_flash_register_hal_io(&nand_hal_io);
   nand_flash_init();
-  status = nand_flash_id_read(id);
-  if(status == -1){
-  log_error("read id err.\r\n");
-  }
-  for(uint8_t i=0;i<5;i++){
-    log_info("id[%d]: %d.\r\n",i,id[i]);
-  }
-  buff = pvPortMalloc(2048);
+
+
+  buff = pvPortMalloc(2112);
   if(buff == 0){
   log_error("malloc error.\r\n");
   }else{
-  
-  status = nand_flash_block_erase(0);
-  if(status == -1){
-  log_error("block erase error.\r\n");
-  }else{
-  log_info("block erase ok.\r\n");
+  log_info("malloc ok.\r\n");
   }
-  for(uint16_t i=0;i<2048;i++){
-   buff[i]=i;
-  }
-  status = nand_flash_page_program(0,buff,2048);
-  if(status == -1){
-  log_error("page program error.\r\n");
-  }else{
-  log_info("page program ok.\r\n");
-  }
-  status = nand_flash_page_read(0,buff,2048);
-  if(status == -1){
-  log_error("page read error.\r\n");
-  }else{
-   log_info("page read ok.\r\n"); 
-   for(uint16_t i=0;i<2048;i++){
-   log_debug("buff[%d]:%d.\r\n",i,buff[i]);
-   osDelay(1);
-  } 
-  }
-  }
+  log_debug("wait cmd...\r\n");
   for(;;)
   {
+   status =SEGGER_RTT_Read(0,cmd,3);
+   if(status == 3){
+   switch(cmd[0])
+   {
+   case 'e':
+   log_debug("erase block :%d.\r\n",cmd[1]-'0');
+   status = nand_flash_block_erase(cmd[1]-'0');
+   if(status == -1){
+   log_error("block erase error.\r\n");
+   }else{
+   log_info("block erase ok.\r\n");
+   }
+   break;
+   
+   case 'p':
+   log_debug("program page :%d.\r\n",cmd[1]-'0');
+   status = nand_flash_page_program(cmd[1]-'0',0,buff,2112);
+   if(status == -1){
+   log_error("page program error.\r\n");
+   }else{
+   log_info("page program ok.\r\n");
+   }
+   break;
+   
+   case 'P':
+   log_debug("program page spare:%d.\r\n",cmd[1]-'0');
+   status = nand_flash_page_program(cmd[1]-'0',2048,buff,64);
+   if(status == -1){
+   log_error("page program error.\r\n");
+   }else{
+   log_info("page program ok.\r\n");
+   }
+   break;
+   
+   case 'r':
+   log_debug("read page :%d.\r\n",cmd[1]-'0');
+   status = nand_flash_page_read(cmd[1]-'0',0,buff,2112);
+   if(status == -1){
+   log_error("page read error.\r\n");
+   }else{
+   log_info("page read ok.\r\n"); 
+   } 
+   break;
+   
+   case 'R':
+   log_debug("read page spare:%d.\r\n",cmd[1]-'0');
+   status = nand_flash_page_read(cmd[1]-'0',2048,buff,64);
+   if(status == -1){
+   log_error("page read error.\r\n");
+   }else{
+   log_info("page read ok.\r\n"); 
+   } 
+   break;
+   
+   case 'i':
+   status = nand_flash_id_read(id);
+   if(status == -1){
+   log_error("read id err.\r\n");
+   }else{
+   log_info("read id ok.\r\n");
+   for(uint8_t i=0;i<5;i++){
+   log_info("id[%d]: %d.\r\n",i,id[i]);
+   }
+   }
+   break;
+   
+   case 'f':
+   for(uint16_t i=0;i<2112;i++){
+   buff[i] =i;
+   }
+   log_debug("fill 0 1 ...2111 ok.\r\n");
+   break;
+   
+   case 'o':
+   for(uint16_t i=0;i<2112;i++){
+   log_debug("buff[%d]:%d.\r\n",i,buff[i]);
+   osDelay(2); 
+   }
+   break;
+   default:
+   log_error("error cmd:%d.\r\n",cmd[0]);    
+   }
+   }
+   
     HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
     osDelay(40);
     HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);

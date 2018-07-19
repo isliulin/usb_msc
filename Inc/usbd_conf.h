@@ -101,9 +101,9 @@
 /*---------- -----------*/
 #define USBD_DEBUG_LEVEL     0
 /*---------- -----------*/
-#define USBD_SELF_POWERED     1
+#define USBD_SELF_POWERED     0
 /*---------- -----------*/
-#define MSC_MEDIA_PACKET     512
+#define MSC_MEDIA_PACKET     2048
 
 /****************************************/
 /* #define for FS and HS identification */

@@ -3,3 +3,6 @@
 !/EWARM/startup_stm32f103xb.s
 !/EWARM/stm32f103xb_flash.icf
 !/EWARM/stm32f103xb_sram.icf
+!/EWARM/Project.eww
+!/EWARM/usb_msc.ewp
+!/EWARM/usb_msc.ewd
